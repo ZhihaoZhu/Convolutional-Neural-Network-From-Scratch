@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pickle
 from nn import *
 
 
@@ -77,15 +78,20 @@ def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, test_size):
     loss, acc = compute_loss_and_acc(test_y, p)
     return loss/test_size, acc
 
+def random_kernel_init(input_channel, output_channel, size):
+    return np.random.normal(loc = 0, scale = 1.0, size = size)
+
 
 input_size = 1568
 hidden_size = 100
 output_size = 19
 batch_size = 100
 max_iters = 30
+stride = 1
+padding = 2
 learning_rate = 0.01
 params = {1:{},2:{}}
-Momentum = -0.5
+Momentum = -0.1
 epsilon = 1e-9
 
 '''
@@ -124,6 +130,7 @@ print("test_size:", test_size)
 '''
     Initialize the weight
 '''
+
 
 W1 = random_normal_weight_init(input_size, hidden_size)
 b1 = zeros_bias_init(hidden_size)
