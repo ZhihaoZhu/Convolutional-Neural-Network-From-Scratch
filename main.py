@@ -42,16 +42,23 @@ def relu(x):
     res = sigfunc(x)
     return res
 
-def max_pooling_forward(x):
+def max_pooling_forward(x, params, layer):
     batch_number, C, _, _ = x.shape
     cols, out_size = im2col(x, 2, padding=0, stride=2)
-    cols_w,cols_h = cols.shape
-    cols.reshape(C, cols_w/C, -1)  #注意im2col的定义，这里的col已经被reshape过了
-    MP_index = np.max(cols, axis=1)
+    print(cols.shape)
+    cols_w, cols_h = cols.shape
+    d = cols.reshape(C, int(cols_w / C), 500)
+    MP_value = np.max(d, axis=1)
+    MP_index = np.argmax(d, axis=1)
+    param_name = "MP_index" + layer
+    params[param_name] = MP_index
+    MP_value = MP_value.reshape(C,out_size,out_size,batch_number)
+    MP_value = MP_value.transpose(3, 0, 1, 2)
+    return MP_value
 
 
-def forward_pass(X, W, b, layer, activation=Sigmoid()):
 
+def MLP_forward(X, W, b, layer, activation=Sigmoid()):
     pre_act = X @ W + b
     post_act = activation.forward(pre_act)
     params[layer] = (X, pre_act, post_act)
