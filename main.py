@@ -3,8 +3,55 @@ import os
 import pickle
 from nn import *
 
+# Apply the im2col method
+def im2col(x, kernel_size, padding=1, stride=1):
+    x_padded = np.pad(x, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant')
+    input_size = x.shape[2]
+    C = x.shape[1]
+    out_size = int((input_size + 2 * padding - kernel_size) / stride + 1)
+    l = np.repeat(np.arange(C), kernel_size * kernel_size).reshape(-1, 1)
+
+    m1 = np.repeat(np.arange(kernel_size), kernel_size)
+    m1 = np.tile(m1, C)
+    m2 = stride * np.repeat(np.arange(out_size), out_size)
+
+    n1 = np.tile(np.arange(kernel_size), kernel_size * C)
+    n2 = stride * np.tile(np.arange(out_size), out_size)
+
+    m = m1.reshape(-1, 1) + m2.reshape(1, -1)
+    n = n1.reshape(-1, 1) + n2.reshape(1, -1)
+
+    cols = x_padded[:, l, m, n]
+    cols = cols.transpose(1, 2, 0).reshape(kernel_size * kernel_size * C, -1)
+    return cols, out_size
+
+def convolution_forward(x,kernels,padding,conv_stride,params,layer):
+    kernel_size = kernels.shape[2]
+    cols,out_size = im2col(x, kernel_size, padding=padding, stride=conv_stride)
+    kernel_cols = kernels.reshape(kernels.shape[0],-1)
+    output = kernel_cols @ cols
+    out = output.reshape(kernels.shape[0], out_size, out_size, x.shape[0])
+    out = out.transpose(3, 0, 1, 2)
+    param_name = "conv_output" + layer
+    params[param_name] = out
+    return out
+
+def relu(x):
+    sig = lambda p: p if p > 0 else 0
+    sigfunc = np.vectorize(sig)
+    res = sigfunc(x)
+    return res
+
+def max_pooling_forward(x):
+    batch_number, C, _, _ = x.shape
+    cols, out_size = im2col(x, 2, padding=0, stride=2)
+    cols_w,cols_h = cols.shape
+    cols.reshape(C, cols_w/C, -1)  #注意im2col的定义，这里的col已经被reshape过了
+    MP_index = np.max(cols, axis=1)
+
 
 def forward_pass(X, W, b, layer, activation=Sigmoid()):
+
     pre_act = X @ W + b
     post_act = activation.forward(pre_act)
     params[layer] = (X, pre_act, post_act)
@@ -79,7 +126,7 @@ def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, test_size):
     return loss/test_size, acc
 
 def random_kernel_init(input_channel, output_channel, size):
-    return np.random.normal(loc = 0, scale = 1.0, size = size)
+    return np.random.normal(loc = 0, scale = 1.0, size = (output_channel, input_channel, size*size))
 
 
 input_size = 1568
@@ -136,6 +183,7 @@ W1 = random_normal_weight_init(input_size, hidden_size)
 b1 = zeros_bias_init(hidden_size)
 W2 = random_normal_weight_init(hidden_size, output_size)
 b2 = zeros_bias_init(output_size)
+
 M_W1, M_W2, M_b1, M_b2 = W1, W2, b1, b2
 print("Weight initialized")
 
