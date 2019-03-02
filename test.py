@@ -2,34 +2,21 @@ import pickle
 import numpy as np
 
 
-
-
-def im2col(x, kernel_size, padding=1, stride=1):
-  x_padded = np.pad(x, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant')
-  input_size = x.shape[2]
-  C = x.shape[1]
-  out_size = int((input_size + 2 * padding - kernel_size) / stride + 1)
-  l = np.repeat(np.arange(C), kernel_size * kernel_size).reshape(-1, 1)
-
-  m1 = np.repeat(np.arange(kernel_size), kernel_size)
-  m1 = np.tile(m1, C)
-  m2 = stride * np.repeat(np.arange(out_size), out_size)
-
-  n1 = np.tile(np.arange(kernel_size), kernel_size * C)
-  n2 = stride * np.tile(np.arange(out_size), out_size)
-
-  m = m1.reshape(-1, 1) + m2.reshape(1, -1)
-  n = n1.reshape(-1, 1) + n2.reshape(1, -1)
-
-  cols = x_padded[:, l, m, n]
-  print(cols.shape)
-  cols = cols.transpose(1, 2, 0).reshape(kernel_size * kernel_size * C, -1)
-  print(cols.shape)
-  return cols
-
-x = np.arange(30000).reshape(100,3,10,10)
-col = im2col(x, 3, padding=2, stride=1)
-print(col)
+'''
+    read data
+'''
+# import pickle
+# import matplotlib.pyplot as plt
+#
+# with open("../data/sampledCIFAR10", "rb") as f :
+#     data = pickle.load(f)
+#     train, val, test = data["train"], data["val"], data["test"]
+#     n_samples = train["data"].shape[0]
+#     train["data"] = train["data"].reshape(n_samples, 3, 32, 32)
+#     print(train["data"].shape)
+#     image = train["data"][9,:,:,:].transpose(1,2,0)
+#     plt.imshow(image)
+#     plt.show()
 
 '''
     test1
