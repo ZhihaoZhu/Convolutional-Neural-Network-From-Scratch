@@ -24,6 +24,7 @@ def im2col(x, kernel_size, padding=1, stride=1):
     cols = cols.transpose(1, 2, 0).reshape(kernel_size * kernel_size * C, -1)
     return cols, out_size
 
+
 def col2im(cols, x_shape, kernel_size=3, padding=1,stride=1):
     batch_number, C, H, W = x_shape
     x_padded = np.zeros((batch_number, C, H + 2 * padding, W + 2 * padding))
@@ -64,18 +65,18 @@ def convolution(x,kernels,padding,conv_stride, layer):
 
 def relu(x,layer):
     params[layer]["pre_activ"] = x
-    sig = lambda p: p if p > 0 else 0
+    sig = lambda p: p if p >= 0 else 0
     sigfunc = np.vectorize(sig)
     res = sigfunc(x)
     return res
 
 def relu_deriv(x):
-    sig = lambda p: 1 if p > 0 else 0
+    sig = lambda p: 1 if p >= 0 else 0
     sigfunc = np.vectorize(sig)
     res = sigfunc(x)
     return res
 
-def max_pooling(x, params, MP_stride, layer):
+def max_pooling(x, MP_stride, layer):
     batch_number, C, W, H = x.shape
     params[layer]["pre_MP_size"] = x.shape
     x = x.reshape(batch_number*C,1, W, H)
@@ -94,13 +95,11 @@ def convolution_forward(x,kernels,padding,conv_stride,MP_stride,layer):
 
     relu_result = relu(conv_result, layer=layer)
 
-    MP_result = max_pooling(relu_result, params, MP_stride, layer)
+    MP_result = max_pooling(relu_result, MP_stride, layer)
 
     return MP_result
 
 def convolution_backward(delta, kernel, padding, conv_stride, MP_stride, layer):
-
-
     # max pooling backward
     input_shape = params[layer]["pre_MP_size"]
     batch_number, C, W, H = input_shape
@@ -128,14 +127,11 @@ def convolution_backward(delta, kernel, padding, conv_stride, MP_stride, layer):
 
     return dW, dX
 
-
 def MLP_forward(X, W, b, layer, activation=Sigmoid()):
     pre_act = X @ W + b
     post_act = activation.forward(pre_act)
     params[layer] = (X, pre_act, post_act)
     return post_act
-
-
 
 def get_random_batches(x,y,batch_size):
     batches = []
@@ -202,7 +198,13 @@ def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, test_size):
     return loss/test_size, acc
 
 def random_kernel_init(input_channel, output_channel, size):
-    return np.random.normal(loc = 0, scale = 1.0, size = (output_channel, input_channel, size, size))
+    d0 = output_channel
+    d1 = input_channel * size * size
+    W = np.random.uniform(-np.sqrt(6) / np.sqrt(d0 + d1),
+                          np.sqrt(6) / np.sqrt(d0 + d1), d0 * d1).reshape(output_channel, input_channel, size, size)
+    return W
+
+
 
 
 input_size = 256
@@ -253,11 +255,11 @@ with open("../data/sampledCIFAR10", "rb") as f :
     Initialize the weight
 '''
 
+
 kernel1 = random_kernel_init(3, output_channel1, 5)
 W1 = random_normal_weight_init(input_size, hidden_size)
 b1 = zeros_bias_init(hidden_size)
 print("Weight initialized")
-
 
 '''
     Get batches
@@ -285,7 +287,9 @@ for itr in range(max_iters):
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
 
         flattened = conv1.reshape(conv1.shape[0],-1)
+
         p = MLP_forward(flattened, W1, b1, layer=2, activation=Softmax())
+
 
         # calculate loss
         loss, acc = compute_loss_and_acc(yb, p)
@@ -299,6 +303,7 @@ for itr in range(max_iters):
         delta2, grad_W1, grad_b1 = MLP_backwards(delta1, W1, b1, layer=2, activation_deriv=linear_deriv)
         delta2 = delta2.reshape(100,1,16,16)
         dW,_ = convolution_backward(delta2, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
+        # print("dW", dW)
         # Update the weight
         '''
             Without Momentum
@@ -306,6 +311,7 @@ for itr in range(max_iters):
         W1 -= learning_rate * grad_W1
         b1 -= learning_rate * grad_b1
         kernel1 -= learning_rate * dW
+
 
     if itr % 2 == 0:
 
