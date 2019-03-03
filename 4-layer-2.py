@@ -286,7 +286,7 @@ for itr in range(max_iters):
     for xb, yb in batches:
         i += 1
         # forward
-        conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
+        conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
         flattened = conv1.reshape(conv1.shape[0],-1)
         h = MLP_forward(flattened, W1, b1, layer=2, activation=Sigmoid())
         p = MLP_forward(h, W2, b2, layer=3, activation=Softmax())
