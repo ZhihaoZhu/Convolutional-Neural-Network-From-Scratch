@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="87bf0dce-a099-40a8-b1bb-551cbb36b111" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/4-layer.py" afterPath="$PROJECT_DIR$/4-layer.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/4-layer-2.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,11 +15,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
+      <file leaf-file-name="3-layer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/3-layer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1720">
-              <caret line="316" column="0" lean-forward="true" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
+            <state relative-caret-position="348">
+              <caret line="356" column="10" lean-forward="true" selection-start-line="356" selection-start-column="10" selection-end-line="356" selection-end-column="10" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -26,11 +27,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="4-layer.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/4-layer.py">
+      <file leaf-file-name="4-layer-2.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/4-layer-2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="287" column="17" lean-forward="true" selection-start-line="287" selection-start-column="17" selection-end-line="287" selection-end-column="17" />
+            <state relative-caret-position="220">
+              <caret line="298" column="22" lean-forward="true" selection-start-line="298" selection-start-column="22" selection-end-line="298" selection-end-column="22" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -74,12 +75,13 @@
         <option value="$PROJECT_DIR$/3-layer.py" />
         <option value="$PROJECT_DIR$/3-layer-2.py" />
         <option value="$PROJECT_DIR$/4-layer.py" />
+        <option value="$PROJECT_DIR$/4-layer-2.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="243" />
-    <option name="y" value="23" />
+    <option name="x" value="207" />
+    <option name="y" value="34" />
     <option name="width" value="1138" />
     <option name="height" value="877" />
   </component>
@@ -309,7 +311,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="243" y="23" width="1138" height="877" extended-state="0" />
+    <frame x="207" y="34" width="1138" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.258348" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -425,16 +427,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/3-layer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="344" column="3" lean-forward="true" selection-start-line="344" selection-start-column="3" selection-end-line="344" selection-end-column="3" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1720">
@@ -447,8 +439,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/4-layer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
-          <caret line="287" column="17" lean-forward="true" selection-start-line="287" selection-start-column="17" selection-end-line="287" selection-end-column="17" />
+        <state relative-caret-position="152">
+          <caret line="275" column="3" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="360" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/3-layer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="356" column="10" lean-forward="true" selection-start-line="356" selection-start-column="10" selection-end-line="356" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/4-layer-2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="298" column="22" lean-forward="true" selection-start-line="298" selection-start-column="22" selection-end-line="298" selection-end-column="22" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
