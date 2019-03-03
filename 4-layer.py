@@ -206,18 +206,18 @@ def random_kernel_init(input_channel, output_channel, size):
     return np.random.normal(loc = 0, scale = 1.0, size = (output_channel, input_channel, size, size))
 
 
-input_size = 256
+input_size = 36*16*16
 hidden_size = 100
 output_size = 10
 batch_size = 100
-max_iters = 30
+max_iters = 20
 stride = 1
 padding = 2
 learning_rate = 0.01
 params = {1:{},2:{}}
 Momentum = -0.1
 epsilon = 1e-9
-output_channel1 = 1
+output_channel1 = 36
 
 '''
     Get the train/val/test dataset
@@ -284,7 +284,6 @@ for itr in range(max_iters):
     avg_acc = 0
     i = 0
     for xb, yb in batches:
-        print(i)
         i += 1
         # forward
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
@@ -304,13 +303,14 @@ for itr in range(max_iters):
         delta2, grad_W2, grad_b2 = MLP_backwards(delta1, W2, b2, layer=3, activation_deriv=linear_deriv)
         delta3, grad_W1, grad_b1 = MLP_backwards(delta2, W1, b1, layer=2, activation_deriv=sigmoid_deriv)
 
-        delta3 = delta3.reshape(100,1,16,16)
+        delta3 = delta3.reshape(100,36,16,16)
         dW,_ = convolution_backward(delta3, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
         # Update the weight
         '''
             Without Momentum
         '''
         if i%50 == 0:
+            print(i)
             print(dW)
         W2 -= learning_rate * grad_W2
         b2 -= learning_rate * grad_b2
@@ -326,7 +326,7 @@ for itr in range(max_iters):
         train_loss.append(total_loss/train_size)
         get_val_loss(val_X, val_Y, val_loss, W1, b1, W2, b2, kernel1, val_size, val_acc)
 
-
+np.savez("kernel1", kernel1)
 
 '''
     Show the error rate
