@@ -1,6 +1,20 @@
 import pickle
 import numpy as np
 
+def relu(x):
+    sig = lambda p: p if p >= 0 else 0
+    sigfunc = np.vectorize(sig)
+    res = sigfunc(x)
+    return res
+
+
+a = np.random.rand(4,4,4,4)-0.5
+print(a[0,0,:,:])
+x = relu(a)
+print(x[0,0,:,:])
+
+
+
 
 '''
     read data

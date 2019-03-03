@@ -5,7 +5,7 @@ from nn import *
 
 # Apply the im2col method
 def im2col(x, kernel_size, padding=1, stride=1):
-    x_padded = np.pad(x, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant')
+    x_padded = np.pad(x, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant').astype(float)
     input_size = x.shape[2]
     C = x.shape[1]
     out_size = int((input_size + 2 * padding - kernel_size) / stride + 1)
@@ -53,8 +53,8 @@ def col2im(cols, x_shape, kernel_size=3, padding=1,stride=1):
 def convolution(x,kernels,padding,conv_stride, layer):
     kernel_size = kernels.shape[2]
     cols,out_size = im2col(x, kernel_size, padding=padding, stride=conv_stride)
-    params[layer]["x_shape"] = x.shape
 
+    params[layer]["x_shape"] = x.shape
     params[layer]["cols"] = cols
     kernel_cols = kernels.reshape(kernels.shape[0],-1)
     output = kernel_cols @ cols
@@ -65,13 +65,13 @@ def convolution(x,kernels,padding,conv_stride, layer):
 
 def relu(x,layer):
     params[layer]["pre_activ"] = x
-    sig = lambda p: p if p >= 0 else 0
+    sig = lambda p: p if p >= 0.0 else 0.0
     sigfunc = np.vectorize(sig)
     res = sigfunc(x)
     return res
 
 def relu_deriv(x):
-    sig = lambda p: 1 if p >= 0 else 0
+    sig = lambda p: 1.0 if p >= 0.0 else 0.0
     sigfunc = np.vectorize(sig)
     res = sigfunc(x)
     return res
@@ -91,8 +91,11 @@ def max_pooling(x, MP_stride, layer):
     return MP_value
 
 def convolution_forward(x,kernels,padding,conv_stride,MP_stride,layer):
-    conv_result = convolution(x,kernels,padding,conv_stride,layer)
 
+
+    conv_result = convolution(x,kernels,padding,conv_stride,layer)
+    # print(conv_result)
+    # print("----------------------")
     relu_result = relu(conv_result, layer=layer)
 
     MP_result = max_pooling(relu_result, MP_stride, layer)
@@ -207,7 +210,7 @@ def random_kernel_init(input_channel, output_channel, size):
 
 
 
-input_size = 256
+input_size = 16*16*36
 hidden_size = 10
 batch_size = 100
 max_iters = 30
@@ -217,7 +220,7 @@ learning_rate = 0.01
 params = {1:{},2:{}}
 Momentum = -0.1
 epsilon = 1e-9
-output_channel1 = 1
+output_channel1 = 36
 
 '''
     Get the train/val/test dataset
@@ -281,7 +284,7 @@ for itr in range(max_iters):
     avg_acc = 0
     i = 0
     for xb, yb in batches:
-        print(i)
+        print("batch:", i)
         i += 1
         # forward
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
@@ -301,16 +304,16 @@ for itr in range(max_iters):
         # backward
         delta1 = p - yb
         delta2, grad_W1, grad_b1 = MLP_backwards(delta1, W1, b1, layer=2, activation_deriv=linear_deriv)
-        delta2 = delta2.reshape(100,1,16,16)
+        delta2 = delta2.reshape(100,36,16,16)  # 可能需要transpose
         dW,_ = convolution_backward(delta2, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
-        # print("dW", dW)
+        print(dW)
         # Update the weight
         '''
             Without Momentum
         '''
         W1 -= learning_rate * grad_W1
         b1 -= learning_rate * grad_b1
-        kernel1 -= learning_rate * dW
+        kernel1 -= learning_rate * 0.01 * dW
 
 
     if itr % 2 == 0:
