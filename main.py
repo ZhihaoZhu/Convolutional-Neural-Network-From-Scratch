@@ -96,6 +96,7 @@ def convolution_forward(x,kernels,padding,conv_stride,MP_stride,layer):
     conv_result = convolution(x,kernels,padding,conv_stride,layer)
     # print(conv_result)
     # print("----------------------")
+
     relu_result = relu(conv_result, layer=layer)
 
     MP_result = max_pooling(relu_result, MP_stride, layer)
@@ -210,10 +211,10 @@ def random_kernel_init(input_channel, output_channel, size):
 
 
 
-input_size = 16*16*36
+input_size = 36*16*16
 hidden_size = 10
 batch_size = 100
-max_iters = 30
+max_iters = 20
 stride = 1
 padding = 2
 learning_rate = 0.01
@@ -284,7 +285,6 @@ for itr in range(max_iters):
     avg_acc = 0
     i = 0
     for xb, yb in batches:
-        print("batch:", i)
         i += 1
         # forward
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
@@ -304,16 +304,20 @@ for itr in range(max_iters):
         # backward
         delta1 = p - yb
         delta2, grad_W1, grad_b1 = MLP_backwards(delta1, W1, b1, layer=2, activation_deriv=linear_deriv)
+        # print(grad_W1)
         delta2 = delta2.reshape(100,36,16,16)  # 可能需要transpose
         dW,_ = convolution_backward(delta2, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
-        print(dW)
         # Update the weight
         '''
             Without Momentum
         '''
+        if i%50 == 0:
+            print(dW)
+            print("batch:", i)
+
         W1 -= learning_rate * grad_W1
         b1 -= learning_rate * grad_b1
-        kernel1 -= learning_rate * 0.01 * dW
+        kernel1 -= learning_rate * 0.1 * dW
 
 
     if itr % 2 == 0:
