@@ -210,7 +210,7 @@ input_size = 256
 hidden_size = 100
 output_size = 10
 batch_size = 100
-max_iters = 30
+max_iters = 20
 stride = 1
 padding = 2
 learning_rate = 0.01
@@ -284,7 +284,6 @@ for itr in range(max_iters):
     avg_acc = 0
     i = 0
     for xb, yb in batches:
-        print(i)
         i += 1
         # forward
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
@@ -312,11 +311,12 @@ for itr in range(max_iters):
         '''
         if i%50 == 0:
             print(dW)
+            print(i)
         W2 -= learning_rate * grad_W2
         b2 -= learning_rate * grad_b2
         W1 -= learning_rate * grad_W1
         b1 -= learning_rate * grad_b1
-        kernel1 -= learning_rate * dW
+        kernel1 -= learning_rate *0.1* dW
 
     if itr % 2 == 0:
 
