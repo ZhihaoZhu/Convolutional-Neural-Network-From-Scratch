@@ -185,7 +185,7 @@ def MLP_backwards(delta, W, b, layer, activation_deriv=sigmoid_deriv):
 
 def get_val_loss(val_X, val_y, val_loss, W1, b1, W2, b2, kernel1, val_size, val_acc):
     # forward
-    conv1 = convolution_forward(val_X, kernel1, padding=padding, conv_stride=1, MP_stride=2, layer=1)
+    conv1 = convolution_forward(val_X, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
     flattened = conv1.reshape(conv1.shape[0], -1)
     h = MLP_forward(flattened, W1, b1, layer=2, activation=Sigmoid())
     p = MLP_forward(h, W2, b2, layer=3, activation=Softmax())
@@ -195,9 +195,11 @@ def get_val_loss(val_X, val_y, val_loss, W1, b1, W2, b2, kernel1, val_size, val_
     val_loss.append(loss/val_size)
     val_acc.append(acc)
 
-def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, test_size):
-    h1 = MLP_forward(test_X, W1, b1, layer=1, activation=Sigmoid())
-    p = MLP_forward(h1, W2, b2, layer=2, activation=Softmax())
+def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, kernel1, test_size):
+    conv1 = convolution_forward(test_X, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
+    flattened = conv1.reshape(conv1.shape[0], -1)
+    h = MLP_forward(flattened, W1, b1, layer=2, activation=Sigmoid())
+    p = MLP_forward(h, W2, b2, layer=3, activation=Softmax())
 
     loss, acc = compute_loss_and_acc(test_y, p)
     return loss/test_size, acc
@@ -206,11 +208,11 @@ def random_kernel_init(input_channel, output_channel, size):
     return np.random.normal(loc = 0, scale = 1.0, size = (output_channel, input_channel, size, size))
 
 
-input_size = 256
+input_size = 4*4
 hidden_size = 100
 output_size = 10
 batch_size = 100
-max_iters = 30
+max_iters = 20
 stride = 1
 padding = 2
 learning_rate = 0.01
@@ -284,7 +286,7 @@ for itr in range(max_iters):
     avg_acc = 0
     i = 0
     for xb, yb in batches:
-        print(i)
+
         i += 1
         # forward
         conv1 = convolution_forward(xb, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
@@ -305,11 +307,14 @@ for itr in range(max_iters):
         delta3, grad_W1, grad_b1 = MLP_backwards(delta2, W1, b1, layer=2, activation_deriv=sigmoid_deriv)
 
         delta3 = delta3.reshape(batch_size,1,4,4)
-        dW,_ = convolution_backward(delta2, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
+        dW,_ = convolution_backward(delta3, kernel1, padding=padding, conv_stride=1, MP_stride=8, layer=1)
         # Update the weight
         '''
             Without Momentum
         '''
+        if i%50 == 0:
+            print(i)
+            print(dW)
         W2 -= learning_rate * grad_W2
         b2 -= learning_rate * grad_b2
         W1 -= learning_rate * grad_W1
@@ -354,4 +359,5 @@ plt.ylabel('Accuracy')
 plt.grid()
 plt.show()
 
-
+test_loss, test_acc = test_loss_and_accuracy(test_X, test_Y, W1, b1, W2, b2, kernel1, test_size)
+print(test_acc)
