@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from nn import *
+import pickle
 
 
 def forward_pass(X, W, b, layer, activation=Sigmoid()):
@@ -12,6 +13,7 @@ def forward_pass(X, W, b, layer, activation=Sigmoid()):
 def get_random_batches(x,y,batch_size):
     batches = []
     N = x.shape[0]
+    x = x.reshape(N,-1)
     rand_index = np.random.permutation(N)
     num_batches = N//batch_size
     for i in range(num_batches):
@@ -78,6 +80,7 @@ def backwards(delta, W, b, layer, activation_deriv=sigmoid_deriv):
 
 def get_val_loss(val_X, val_y, val_loss, W1, b1, W2, b2, W3, b3, val_size, val_acc):
     # forward
+    val_X = val_X.reshape(val_X.shape[0],-1)
     h1 = forward_pass(val_X, W1, b1, layer=1, activation=Sigmoid())
     h = forward_pass(h1, W2, b2, layer=2, activation=Sigmoid())
     p = forward_pass(h, W3, b3, layer=3, activation=Softmax())
@@ -96,49 +99,45 @@ def test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, W3, b3, test_size):
     return loss/test_size, acc
 
 
-input_size = 1568
+input_size = 3*32*32
 hidden_size = 100
 hidden_size1 = 20
-output_size = 19
+output_size = 10
 batch_size = 100
-max_iters = 150
-learning_rate = 1e-2
+max_iters = 100
+learning_rate = 1e-3
 params = {1:{},2:{},3:{}}
 cache = {1:{},2:{},3:{}}
 Momentum = -0.0
 weight_decay = 0.0
 epsilon = 1e-9
+with open("../data/sampledCIFAR10", "rb") as f :
+    data = pickle.load(f)
+    train, val, test = data["train"], data["val"], data["test"]
+    n_train_samples = train["data"].shape[0]
+    n_val_samples = val["data"].shape[0]
+    n_test_samples = test["data"].shape[0]
 
-'''
-    Get the train/val/test dataset
-'''
-train = np.loadtxt('../data/data/train.txt',delimiter= ',',unpack= False)
-train_X = train[:,:-1]
-train_Y = train[:,-1].astype(int)
-train_y = np.zeros((train_Y.shape[0],19))
-train_y[np.arange(train_Y.shape[0]),train_Y] = 1
-print("Successfully loaded training data")
+    train_X = train["data"].reshape(n_train_samples, 3, 32, 32)
+    val_X = val["data"].reshape(n_val_samples, 3, 32, 32)
+    test_X = test["data"].reshape(n_test_samples, 3, 32, 32)
+    train_size = train_X.shape[0]
+    val_size = val_X.shape[0]
+    test_size = test_X.shape[0]
 
-val = np.loadtxt('../data/data/val.txt',delimiter= ',',unpack= False)
-val_X = val[:,:-1]
-val_Y = val[:,-1].astype(int)
-val_y = np.zeros((val_Y.shape[0],19))
-val_y[np.arange(val_Y.shape[0]),val_Y] = 1
-print("Successfully loaded val data")
+    train_y = train["labels"].astype(int)
+    train_Y = np.zeros((train_y.shape[0],10))
+    train_Y[np.arange(train_y.shape[0]),train_y] = 1
 
-test = np.loadtxt('../data/data/test.txt',delimiter= ',',unpack= False)
-test_X = test[:,:-1]
-test_Y = test[:,-1].astype(int)
-test_y = np.zeros((test_Y.shape[0],19))
-test_y[np.arange(test_Y.shape[0]),test_Y] = 1
-print("Successfully loaded test data")
+    val_y = val["labels"].astype(int)
+    val_Y = np.zeros((val_y.shape[0], 10))
+    val_Y[np.arange(val_y.shape[0]), val_y] = 1
 
-train_size = train_X.shape[0]
-val_size = val_X.shape[0]
-test_size = test_X.shape[0]
-print("train_size:", train_size)
-print("val_size:", val_size)
-print("test_size:", test_size)
+    test_y = test["labels"].astype(int)
+    test_Y = np.zeros((test_y.shape[0], 10))
+    test_Y[np.arange(test_y.shape[0]), test_y] = 1
+
+    print("successfully load data")
 
 
 
@@ -159,7 +158,7 @@ print("Weight initialized")
 '''
     Get batches
 '''
-batches = get_random_batches(train_X,train_y,batch_size)
+batches = get_random_batches(train_X,train_Y,batch_size)
 print("Successfully splited the training data")
 
 
@@ -215,12 +214,11 @@ for itr in range(max_iters):
 
 
     if itr % 2 == 0:
-        np.save("./saved_model2/W3_%d.npy" % itr, W3)
         avg_acc /= len(batches)
         train_acc.append(avg_acc)
         print("Training epoch:", itr, "training accuracy:", avg_acc)
         train_loss.append(total_loss/train_size)
-        get_val_loss(val_X, val_y, val_loss, W1, b1, W2, b2, W3, b3, val_size, val_acc)
+        get_val_loss(val_X, val_Y, val_loss, W1, b1, W2, b2, W3, b3, val_size, val_acc)
 
 
 '''
@@ -251,10 +249,3 @@ plt.ylabel('Accuracy')
 plt.grid()
 plt.show()
 
-'''
-    Show the error and accuracy for test
-'''
-
-test_size = test_X.shape[0]
-test_loss, test_accuracy = test_loss_and_accuracy(test_X, test_y, W1, b1, W2, b2, W3, b3, test_size)
-print(test_loss, test_accuracy)

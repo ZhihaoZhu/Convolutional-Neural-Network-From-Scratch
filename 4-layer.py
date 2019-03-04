@@ -213,7 +213,7 @@ batch_size = 100
 max_iters = 20
 stride = 1
 padding = 2
-learning_rate = 0.01
+learning_rate = 0.001
 params = {1:{},2:{}}
 Momentum = -0.1
 epsilon = 1e-9
@@ -316,7 +316,7 @@ for itr in range(max_iters):
         b2 -= learning_rate * grad_b2
         W1 -= learning_rate * grad_W1
         b1 -= learning_rate * grad_b1
-        kernel1 -= learning_rate *10* dW
+        kernel1 -= learning_rate*10 * dW
 
     if itr % 2 == 0:
 
