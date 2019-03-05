@@ -48,18 +48,15 @@ def col2im(cols, x_shape, kernel_size=3, padding=1,stride=1):
     return x_padded[:, :, padding:-padding, padding:-padding]
 
 
-
 def convolution(x,kernels,padding,conv_stride, layer):
     kernel_size = kernels.shape[2]
     cols,out_size = im2col(x, kernel_size, padding=padding, stride=conv_stride)
     params[layer]["x_shape"] = x.shape
-
     params[layer]["cols"] = cols
     kernel_cols = kernels.reshape(kernels.shape[0],-1)
     output = kernel_cols @ cols
     out = output.reshape(kernels.shape[0], out_size, out_size, x.shape[0])
     out = out.transpose(3, 0, 1, 2)
-
     return out
 
 def relu(x,layer):
