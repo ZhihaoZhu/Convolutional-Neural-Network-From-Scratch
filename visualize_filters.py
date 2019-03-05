@@ -10,7 +10,10 @@ def normalize(filter):
 
     return filter
 
-a = kernels
+# a = np.load("../data/kernel1.npz")
+# a = a["arr_0"]
+b = np.load("../data/kernel1_2.npy")
+a = b
 a = normalize(a)
 a = a.transpose(0,2,3,1)
 
