@@ -214,7 +214,7 @@ def random_kernel_init(input_channel, output_channel, size):
 input_size = 36*16*16
 hidden_size = 10
 batch_size = 100
-max_iters = 20
+max_iters = 10
 stride = 1
 padding = 2
 learning_rate = 0.01
@@ -293,7 +293,6 @@ for itr in range(max_iters):
 
         p = MLP_forward(flattened, W1, b1, layer=2, activation=Softmax())
 
-
         # calculate loss
         loss, acc = compute_loss_and_acc(yb, p)
         # print(loss)
@@ -326,7 +325,8 @@ for itr in range(max_iters):
         train_acc.append(avg_acc)
         print("Training epoch:", itr, "training accuracy:", avg_acc)
         train_loss.append(total_loss/train_size)
-        get_val_loss(val_X, val_Y, val_loss, W1, b1, kernel1, val_size, val_acc)
+        # get_val_loss(val_X, val_Y, val_loss, W1, b1, kernel1, val_size, val_acc)
+        np.save("kernel1", kernel1)
 
 
 

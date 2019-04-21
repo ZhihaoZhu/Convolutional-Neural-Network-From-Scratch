@@ -6,13 +6,15 @@ import matplotlib.pyplot as plt
 def normalize(filter):
     for i in range(filter.shape[0]):
         for j in range(filter.shape[1]):
-            filter[i,j,:,:] = (filter[i,j,:,:] - np.min(filter[i,j,:,:]))/(np.max(filter[i,j,:,:])-np.min(filter[i,j,:,:]))
+            filter[i,j,:,:] = (filter[i,j,:,:] - np.min(filter[i,:,:,:]))/(np.max(filter[i,:,:,:])-np.min(filter[i,:,:,:]))
 
     return filter
 
 # a = np.load("../data/kernel1.npz")
 # a = a["arr_0"]
-b = np.load("../data/kernel1_2.npy")
+b = np.load("kernel1.npy")
+
+
 a = b
 a = normalize(a)
 a = a.transpose(0,2,3,1)

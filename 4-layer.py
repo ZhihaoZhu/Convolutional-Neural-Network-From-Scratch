@@ -326,7 +326,7 @@ for itr in range(max_iters):
         train_loss.append(total_loss/train_size)
         get_val_loss(val_X, val_Y, val_loss, W1, b1, W2, b2, kernel1, val_size, val_acc)
 
-np.savez("kernel1", kernel1)
+np.save("kernel1", kernel1)
 
 '''
     Show the error rate
